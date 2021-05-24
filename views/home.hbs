@@ -1,2 +1,14 @@
 <h1> Home </h1>
 <p>This is the {{ title }} page</p>
+{{#if isAvailable}}
+<ul>
+    {{#each rooms}}
+        <li> <a href="{{this.name}}"> {{this.name}} </a></li>
+    {{/each}}
+</ul>
+{{/if}}
+
+<form action="/create" method="POST">
+    {{!-- <input type="text" name="roomName" placeholder="Enter a room name"/> --}}
+    <input type="submit" value="Create room"/>
+</form>
