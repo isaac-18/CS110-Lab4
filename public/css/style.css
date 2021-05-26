@@ -1,1 +1,21 @@
 /* TODO: style each page */
+.container {
+  border: solid 1px blue;
+}
+
+#messages {
+  /* position: relative; */
+  border: solid 1px red;
+  height: 75vh;
+}
+
+.message {
+  border: solid 1px purple;
+}
+
+.text-box {
+  /* position: absolute;
+  bottom: 0; */
+  border: solid 1px green;
+  width: 100%;
+}

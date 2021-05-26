@@ -7,6 +7,7 @@ const config = require("config");
 const path = require("path");
 const Room = require("./models/Rooms");
 const roomGenerator = require("./util/roomIdGenerator.js");
+const { DateTime } = require("luxon");
 
 // import handlers
 const homeHandler = require("./controllers/home.js");
@@ -51,13 +52,14 @@ app.set("view engine", "hbs");
 // Create controller handlers to handle requests at each endpoint
 app.post("/create", function (req, res) {
   const newRoom = new Room({
-    // name: req.body.roomName,
-    name: roomGenerator.roomIdGenerator(),
+    name: req.body.roomName,
+    roomID: roomGenerator.roomIdGenerator(),
   });
   newRoom
     .save()
     .then(console.log("Room added"))
     .catch((e) => console.log(e));
+  res.redirect("/");
 });
 
 app.get("/getRoom", function (req, res) {
@@ -70,6 +72,41 @@ app.get("/getRoom", function (req, res) {
 
 app.get("/", homeHandler.getHome);
 app.get("/:roomName", roomHandler.getRoom);
+
+app.post("/newMessage", function (req, res) {
+  var messageObj = {
+    user: req.body.username,
+    timestamp: DateTime.now().toLocaleString(DateTime.DATETIME_MED),
+    messageText: req.body.messageText,
+  };
+
+  // Help from this: https://stackoverflow.com/a/49913341
+  Room.findOneAndUpdate(
+    { roomID: req.body.roomID },
+    { $push: { messages: messageObj } },
+    function (error, success) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(success);
+      }
+    }
+  );
+  console.log(req.body);
+});
+
+app.get("/:roomName/messages", function (req, res) {
+  // TODO: FIND BY 'roomID' INSTEAD.
+  Room.find({ name: req.params.roomName })
+    .lean()
+    .then((items) => {
+      res.json(items);
+    })
+    .catch((err) => {
+      // error catching
+      console.log(err);
+    });
+});
 
 // NOTE: This is the sample server.js code we provided, feel free to change the structures
 

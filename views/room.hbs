@@ -1,6 +1,82 @@
-<h1> Room </h1>
-<p>This is a demo of chatroom page</p>
-<p>
-    The room you are visiting is {{ roomName }}
-</p>
-{{!-- <p>To generate a new room, here is the room id: {{ newRoomId }}</p> --}}
+<script src="https://cdn.jsdelivr.net/npm/luxon@1/build/global/luxon.min.js"></script>
+
+<div class="container">
+    <h1> Room </h1>
+    <p>This is a demo of chatroom page</p>
+    <p id="welcome-msg"></p>
+    <p>
+        The room you are visiting is
+        <strong>{{roomName}}</strong> and the room id is: {{roomID}}
+    </p>
+
+    <div id="messages">
+
+    </div>
+
+    <div class="text-box">
+        <form action="/newMessage" method="POST">
+            <input type="hidden" name="roomID" value={{roomID}} />
+            <input type="hidden" name="roomName" id="room-name" value={{roomName}} />
+            <input type="hidden" name="username" id="user-name" value="" />
+            <input type="text" name="messageText" placeholder="Type your message here" />
+            <input type="submit" value="Send" />
+        </form>
+    </div>
+
+</div>
+
+<script>
+    var username = prompt("Enter a username to start chatting", "user123");
+    if (username != null) {
+        document.getElementById("welcome-msg").innerHTML = "Welcome, " + username + ".";
+        document.getElementById("user-name").value = username;
+    }
+
+    console.log("In refresh....");
+
+    var messageIDs = [];
+    var allMessages = [];
+    var uniqueMessages = [];
+    setInterval(refreshMessages, 3000);
+
+    function refreshMessages() {
+        console.log("Fetching....");
+        var roomName = document.getElementById("room-name").value;
+        url = "http://localhost:8080/" + roomName + "/messages"
+        console.log(url);
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                allMessages = data[0].messages;
+                allMessages.forEach((message) => {
+                    if (!messageIDs.includes(message._id)) {
+                        messageIDs.push(message._id);
+                        uniqueMessages.push(message);
+                    }
+                });
+
+            })
+            .catch((err) => {
+                // error catching
+                console.log(err);
+            });
+
+        const messagesContainer = document.getElementById("messages");
+
+        while (messagesContainer.firstChild) {
+            messagesContainer.removeChild(messagesContainer.firstChild);
+        }
+
+        uniqueMessages.forEach((message) => {
+            messageDiv = document.createElement("div");
+            messageDiv.className = "message";
+
+            messageText = document.createElement("p");
+            messageText.appendChild(document.createTextNode(message.messageText))
+
+            messageDiv.appendChild(messageText);
+
+            messagesContainer.insertAdjacentElement("afterbegin", messageDiv);
+        });
+    }
+</script>
