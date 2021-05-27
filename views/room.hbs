@@ -1,6 +1,3 @@
-{{!--
-<script src="https://cdn.jsdelivr.net/npm/luxon@1/build/global/luxon.min.js"></script> --}}
-
 <div class="container">
     <h1> Room </h1>
     <p id="welcome-msg"></p>
@@ -14,7 +11,7 @@
     </div>
 
     <div class="text-box">
-        <form action="/newMessage" method="POST">
+        <form action="/newMessage" id="form" method="POST">
             <input type="hidden" name="roomID" value={{roomID}} />
             <input type="hidden" name="roomName" id="room-name" value={{roomName}} />
             <input type="hidden" name="username" id="user-name" value="" />
@@ -26,18 +23,43 @@
 </div>
 
 <script>
+    // Prompts for username on page load
     var username = prompt("Enter a username to start chatting", "user123");
     if (username != null) {
         document.getElementById("welcome-msg").innerHTML = "Welcome, " + username + ".";
         document.getElementById("user-name").value = username;
     }
 
+    // Fixes issue and allows for messages to still be sent while page loading
+    const formElement = document.getElementById("form");
+    formElement.addEventListener("submit", async (event) => {
+        //event.preventDefault();
+        const elements = event.target;
+        const roomID = elements["roomID"].value;
+        const roomName = elements["roomName"].value;
+        const username = elements["username"].value;
+        const messageText = elements["messageText"].value;
+        const dataToSend = { roomID, roomName, username, messageText };
+
+        fetch("http://localhost:8080/newMessage", {
+            method: "POST",
+            body: JSON.stringify(dataToSend),
+            headers: { 'Content-Type': 'application/json' },
+        });
+    });
+
+
+    // Refresh messages
     var messageIDs = [];
     var allMessages = [];
     var uniqueMessages = [];
     setInterval(refreshMessages, 1000);
 
     function refreshMessages() {
+        // For auto-scrolling - It works but hard to read previous messages since it constantly scrolls down lol
+        // var messagesElement = document.getElementById("messages");
+        // messagesElement.scrollTop = messagesElement.scrollHeight;
+
         var roomName = document.getElementById("room-name").value;
         url = "http://localhost:8080/" + roomName + "/messages"
         console.log(url);
