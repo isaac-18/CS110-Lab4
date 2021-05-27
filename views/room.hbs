@@ -1,8 +1,8 @@
-<script src="https://cdn.jsdelivr.net/npm/luxon@1/build/global/luxon.min.js"></script>
+{{!--
+<script src="https://cdn.jsdelivr.net/npm/luxon@1/build/global/luxon.min.js"></script> --}}
 
 <div class="container">
     <h1> Room </h1>
-    <p>This is a demo of chatroom page</p>
     <p id="welcome-msg"></p>
     <p>
         The room you are visiting is
@@ -32,15 +32,12 @@
         document.getElementById("user-name").value = username;
     }
 
-    console.log("In refresh....");
-
     var messageIDs = [];
     var allMessages = [];
     var uniqueMessages = [];
-    setInterval(refreshMessages, 3000);
+    setInterval(refreshMessages, 1000);
 
     function refreshMessages() {
-        console.log("Fetching....");
         var roomName = document.getElementById("room-name").value;
         url = "http://localhost:8080/" + roomName + "/messages"
         console.log(url);
@@ -71,12 +68,25 @@
             messageDiv = document.createElement("div");
             messageDiv.className = "message";
 
+            userAndDateDiv = document.createElement("div");
+            userAndDateDiv.className = "user-and-date";
+
+            user = document.createElement("p");
+            user.appendChild(document.createTextNode(message.user));
+            userAndDateDiv.appendChild(user)
+
+            date = document.createElement("p");
+            date.appendChild(document.createTextNode(message.timestamp));
+            userAndDateDiv.appendChild(date)
+
+            messageDiv.appendChild(userAndDateDiv);
+
             messageText = document.createElement("p");
             messageText.appendChild(document.createTextNode(message.messageText))
 
             messageDiv.appendChild(messageText);
 
-            messagesContainer.insertAdjacentElement("afterbegin", messageDiv);
+            messagesContainer.insertAdjacentElement("beforeend", messageDiv);
         });
     }
 </script>

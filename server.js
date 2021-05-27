@@ -12,6 +12,7 @@ const { DateTime } = require("luxon");
 // import handlers
 const homeHandler = require("./controllers/home.js");
 const roomHandler = require("./controllers/room.js");
+const { request } = require("express");
 
 const app = express();
 const port = 8080;
@@ -93,6 +94,8 @@ app.post("/newMessage", function (req, res) {
     }
   );
   console.log(req.body);
+  // res.redirect(302, "/" + req.body.roomName);
+  // res.redirect(302, "/" + req.body.roomName + "/messages");
 });
 
 app.get("/:roomName/messages", function (req, res) {

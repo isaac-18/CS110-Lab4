@@ -1,14 +1,61 @@
-<h1> Home </h1>
-<p>This is the {{ title }} page</p>
-{{#if isAvailable}}
-<ul>
-    {{#each rooms}}
-        <li> <a href="{{this.name}}"> {{this.name}} </a></li>
-    {{/each}}
-</ul>
-{{/if}}
+<div class="container">
 
-<form action="/create" method="POST">
-    <input type="text" name="roomName" placeholder="Enter a room name"/>
-    <input type="submit" value="Create room"/>
-</form>
+    <h1> Home </h1>
+    <p>This is the {{ title }} page</p>
+
+    <div class="rooms-container">
+        <ul id="rooms-list" onload="refreshRooms();">
+            <li>Getting rooms...</li>
+        </ul>
+    </div>
+
+
+    <form action="/create" method="POST">
+        <input type="text" name="roomName" placeholder="Enter a room name" />
+        <input type="submit" value="Create room" />
+    </form>
+</div>
+
+<script>
+
+    var roomIDs = [];
+    var roomsToAdd = [];
+    setInterval(refreshRooms, 1000);
+
+    function refreshRooms() {
+        console.log("Refreshing rooms...");
+        fetch("http://localhost:8080/getRoom")
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data);
+                data.forEach((room) => {
+                    if (!roomIDs.includes(room.roomID)) {
+                        roomIDs.push(room.roomID);
+                        roomsToAdd.push(room);
+                    }
+                });
+            })
+            .catch((err) => {
+                // error catching
+                console.log(err);
+            });
+
+        const roomsList = document.getElementById("rooms-list");
+
+        while (roomsList.firstChild) {
+            roomsList.removeChild(roomsList.firstChild);
+        }
+
+        roomsToAdd.forEach((room) => {
+            listItem = document.createElement("li");
+
+            roomLink = document.createElement("a");
+            roomLink.href = room.name;
+            roomLink.appendChild(document.createTextNode(room.name));
+
+            listItem.appendChild(roomLink);
+            roomsList.insertAdjacentElement("beforeend", listItem);
+        });
+    }
+
+</script>

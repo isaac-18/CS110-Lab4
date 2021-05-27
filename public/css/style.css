@@ -7,15 +7,31 @@
   /* position: relative; */
   border: solid 1px red;
   height: 75vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .message {
-  border: solid 1px purple;
+  border-bottom: solid 1px purple;
+  padding: 5px;
+}
+
+.user-and-date {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-and-date p:first-of-type {
+  font-weight: bold;
 }
 
 .text-box {
   /* position: absolute;
   bottom: 0; */
-  border: solid 1px green;
+  /* border: solid 1px green; */
   width: 100%;
 }
+
+/* input[type="text"] {
+  width: 85%;
+} */
